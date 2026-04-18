@@ -19,7 +19,6 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from bundle_platform.pipeline.csv_chunker import chunk_csv
 from bundle_platform.shared.timestamps import detect_timestamp_format, extract_timestamp_str
 from bundle_platform.tools.generic import FileEntry, FileManifest
 
@@ -181,6 +180,9 @@ def chunk_manifest(
     Skips binary files, empty files, and files
     exceeding the 50 MB size limit. Returns a flat list of all chunks.
     """
+    # Local import avoids circular dependency: csv_chunker imports LogChunk from this module
+    from bundle_platform.pipeline.csv_chunker import chunk_csv
+
     chunks: list[LogChunk] = []
     for entry in manifest.entries:
         if entry.path.endswith(".csv"):

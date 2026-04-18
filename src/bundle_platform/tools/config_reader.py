@@ -67,23 +67,38 @@ def read_config(bundle_root: Path, file_path: str) -> str:
     return cap_lines(numbered, limit=_MAX_CONFIG_LINES)
 
 
-def read_sos_command(bundle_root: Path, command_name: str) -> str:
+def read_sos_command(bundle_root: Path, command_name: str, bundle_type: str = "unknown") -> str:
     """
     Read output from a captured command in the bundle.
 
     Why: Bundle types store command output in different directories — RHEL uses
     `sos_commands/` (produced by `sos report`) while ESXi uses `commands/`
-    (produced by `vm-support`). Trying both prefixes makes this tool work
-    transparently for either bundle type without the caller needing to know which
-    layout is in use.
+    (produced by `vm-support`). Using bundle_type to pick the right directory
+    avoids accidentally reading from the wrong location when both exist.
 
     Args:
         bundle_root:  Root directory of the unpacked bundle.
         command_name: Bare filename of the command output (e.g. "uname").
+        bundle_type:  "rhel", "esxi", or "unknown". Determines which directory
+                      to search first; "unknown" falls back to trying both.
 
     Returns:
         Numbered file contents capped at _MAX_CONFIG_LINES, or an error string.
     """
+    # Map bundle type to its command directory
+    _BUNDLE_CMD_DIR: dict[str, str] = {"rhel": "sos_commands", "esxi": "commands"}
+    primary = _BUNDLE_CMD_DIR.get(bundle_type)
+
+    if primary is not None:
+        # Known bundle type — check only the canonical directory
+        if (bundle_root / primary / command_name).exists():
+            return read_config(bundle_root, f"{primary}/{command_name}")
+        return (
+            f"Command output not found: '{command_name}' "
+            f"(checked {primary}/)"
+        )
+
+    # Unknown bundle type — try both directories in order
     for prefix in ("sos_commands", "commands"):
         if (bundle_root / prefix / command_name).exists():
             return read_config(bundle_root, f"{prefix}/{command_name}")
