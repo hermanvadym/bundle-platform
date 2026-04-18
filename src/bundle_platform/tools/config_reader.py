@@ -65,3 +65,24 @@ def read_config(bundle_root: Path, file_path: str) -> str:
 
     numbered = "\n".join(f"{i + 1}: {line}" for i, line in enumerate(lines))
     return cap_lines(numbered, limit=_MAX_CONFIG_LINES)
+
+
+def read_sos_command(bundle_root: Path, command_name: str, bundle_type: str) -> str:
+    """
+    Read output from a captured command in the bundle.
+
+    Why: Bundle types store command output in different directories — RHEL uses
+    `sos_commands/` (produced by `sos report`) while ESXi uses `commands/`
+    (produced by `vm-support`). This function hides that difference so callers
+    always pass a bare command name.
+
+    Args:
+        bundle_root:  Root directory of the unpacked bundle.
+        command_name: Bare filename of the command output (e.g. "uname").
+        bundle_type:  "rhel" or "esxi" (case-insensitive).
+
+    Returns:
+        Numbered file contents capped at _MAX_CONFIG_LINES, or an error string.
+    """
+    subdir = "sos_commands" if bundle_type.lower() == "rhel" else "commands"
+    return read_config(bundle_root, f"{subdir}/{command_name}")

@@ -1,5 +1,5 @@
 """
-Log analysis tools for sosreport bundles.
+Log analysis tools for diagnostic bundles (RHEL sosreport, ESXi vm-support).
 
 These functions implement targeted log extraction — the core of why this agent
 uses far fewer tokens than loading entire files into context. Instead of reading
