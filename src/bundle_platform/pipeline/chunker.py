@@ -19,6 +19,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+from bundle_platform.pipeline.csv_chunker import chunk_csv
 from bundle_platform.shared.timestamps import detect_timestamp_format, extract_timestamp_str
 from bundle_platform.tools.generic import FileEntry, FileManifest
 
@@ -183,7 +184,6 @@ def chunk_manifest(
     chunks: list[LogChunk] = []
     for entry in manifest.entries:
         if entry.path.endswith(".csv"):
-            from pipeline.csv_chunker import chunk_csv  # deferred: module added in Task 6
             chunks.extend(chunk_csv(bundle_root, entry, bundle_type=bundle_type))
         else:
             chunks.extend(chunk_file(bundle_root, entry, bundle_type=bundle_type))
