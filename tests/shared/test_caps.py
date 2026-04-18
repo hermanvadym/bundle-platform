@@ -1,4 +1,4 @@
-from bundle_platform.shared.caps import cap_lines, TRUNCATION_MARKER
+from bundle_platform.shared.caps import cap_lines
 
 
 def test_cap_lines_under_limit():
