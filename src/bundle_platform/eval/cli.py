@@ -8,11 +8,18 @@ from bundle_platform.eval.golden import load_golden_set
 from bundle_platform.eval.report import render_markdown
 from bundle_platform.eval.runner import run_scorecard
 from bundle_platform.eval.strategies.baseline import BaselineStrategy
+from bundle_platform.eval.strategies.combined import CombinedStrategy
 from bundle_platform.eval.strategies.with_dedup import WithDedupStrategy
+from bundle_platform.eval.strategies.with_drain3 import WithDrain3Strategy
+from bundle_platform.eval.strategies.with_rerank import WithRerankStrategy
+from bundle_platform.eval.strategy import Strategy
 
-_STRATEGIES = {
+_STRATEGIES: dict[str, type[Strategy]] = {
     "baseline": BaselineStrategy,
     "with_dedup": WithDedupStrategy,
+    "with_drain3": WithDrain3Strategy,
+    "with_rerank": WithRerankStrategy,
+    "combined": CombinedStrategy,
 }
 
 

@@ -21,3 +21,17 @@ def deduplicate(lines: list[str]) -> list[str]:
             seen.add(line)
             out.append(line)
     return out
+
+
+def collapse_consecutive_duplicates(lines: list[str]) -> list[str]:
+    """Remove duplicate lines that appear consecutively, keeping the first occurrence.
+
+    Unlike deduplicate(), which removes all repeated occurrences regardless of
+    position, this function only collapses adjacent runs. A line that appeared
+    earlier but recurs after different content is kept.
+    """
+    result: list[str] = []
+    for line in lines:
+        if not result or line != result[-1]:
+            result.append(line)
+    return result

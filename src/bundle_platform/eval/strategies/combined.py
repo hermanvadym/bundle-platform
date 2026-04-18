@@ -36,6 +36,7 @@ class CombinedStrategy(WithDrain3Strategy):
     def retrieve(self, question: str) -> RetrievedContext:
         # Step 1: retrieve via baseline (inherited from BaselineStrategy via WithDrain3Strategy)
         from bundle_platform.eval.strategies.baseline import BaselineStrategy
+
         base = BaselineStrategy.retrieve(self, question)
 
         # Step 2: dedup consecutive duplicate lines
