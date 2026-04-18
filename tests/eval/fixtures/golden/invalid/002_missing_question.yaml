@@ -1,0 +1,7 @@
+id: 002_missing_question
+bundle: sosreport.tar.xz
+# question field deliberately omitted
+expected_files:
+  - var/log/messages
+expected_evidence_regex: "oom_kill"
+expected_answer_contains: []

@@ -1,0 +1,10 @@
+id: 001_oom
+bundle: sosreport.tar.xz
+question: "What process was killed by OOM and at what time?"
+expected_files:
+  - var/log/messages
+expected_evidence_regex: "oom_kill.*mysqld"
+expected_answer_contains:
+  - mysqld
+  - "03:14"
+  - OOM
