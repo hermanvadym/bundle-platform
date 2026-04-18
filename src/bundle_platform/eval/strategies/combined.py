@@ -7,6 +7,7 @@ from bundle_platform.eval.strategies.with_rerank import (
     _parse_context_block,
 )
 from bundle_platform.eval.strategy import RetrievedContext
+from bundle_platform.pipeline.deduplicator import collapse_consecutive_duplicates
 from bundle_platform.pipeline.reranker import CrossEncoderReranker
 
 _RERANK_TOP_N = 10
@@ -34,25 +35,18 @@ class CombinedStrategy(WithDrain3Strategy):
         self._reranker = CrossEncoderReranker()
 
     def retrieve(self, question: str) -> RetrievedContext:
-        # Step 1: retrieve via baseline (inherited from BaselineStrategy via WithDrain3Strategy)
+        # Call BaselineStrategy directly to get raw retrieved context; bypasses
+        # WithDrain3Strategy.retrieve intentionally so this class controls the
+        # full pipeline order.
         from bundle_platform.eval.strategies.baseline import BaselineStrategy
 
         base = BaselineStrategy.retrieve(self, question)
 
-        # Step 2: dedup consecutive duplicate lines
-        deduped_lines = []
-        prev = None
-        for line in base.text.splitlines():
-            if line != prev:
-                deduped_lines.append(line)
-            prev = line
-        deduped_text = "\n".join(deduped_lines)
+        deduped_text = "\n".join(collapse_consecutive_duplicates(base.text.splitlines()))
 
-        # Step 3: apply Drain3 templating line by line
         templated_lines = [self._miner.add_log_message(line) for line in deduped_text.splitlines()]
         templated_text = "\n".join(templated_lines)
 
-        # Step 4: parse into chunks, re-rank, format back
         chunks = _parse_context_block(templated_text)
         if not chunks:
             return RetrievedContext(text=templated_text, source_files=base.source_files)

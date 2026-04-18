@@ -11,9 +11,8 @@ _RERANK_TOP_N = 10
 def _parse_context_block(text: str) -> list[dict]:
     """Parse retriever output text into list of chunk dicts.
 
-    Handles both header formats emitted by retriever.py:
+    Handles the header format emitted by retriever.py:
       === filepath (lines X-Y) ===
-      === filepath (keyword matches) ===
     """
     chunks: list[dict] = []
     current_path = ""

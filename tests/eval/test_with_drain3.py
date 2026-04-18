@@ -4,13 +4,10 @@ from __future__ import annotations
 from unittest.mock import MagicMock
 
 from bundle_platform.eval.strategies.with_drain3 import WithDrain3Strategy
-from bundle_platform.eval.strategy import RetrievedContext
 
 
 def test_drain3_strategy_name() -> None:
-    s = WithDrain3Strategy.__new__(WithDrain3Strategy)
-    s.name = "with_drain3"
-    assert s.name == "with_drain3"
+    assert WithDrain3Strategy.name == "with_drain3"
 
 
 def test_drain3_applies_templating() -> None:

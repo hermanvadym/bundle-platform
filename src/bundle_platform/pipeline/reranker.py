@@ -28,6 +28,7 @@ class CrossEncoderReranker:
     def _load(self) -> None:
         if self._model is None:
             from sentence_transformers import CrossEncoder
+
             self._model = CrossEncoder(self.model_name)
 
     def rerank(self, query: str, chunks: list[dict], top_n: int) -> list[dict]:
@@ -48,8 +49,7 @@ class CrossEncoderReranker:
         if not chunks:
             return []
         self._load()
-        from sentence_transformers import CrossEncoder
-        model: CrossEncoder = self._model  # type: ignore[assignment]
+        model = self._model  # type: ignore[assignment]
         pairs = [(query, chunk.get("text", "")) for chunk in chunks]
         raw = model.predict(pairs)
         scores: list[float] = raw.tolist() if hasattr(raw, "tolist") else list(raw)
