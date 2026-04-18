@@ -89,10 +89,6 @@ def tag_file(path: str) -> str:
         # but the rule has prefix "sos_commands/".
         if path.startswith(prefix) or path == prefix.rstrip("/"):
             return category
-    if path.endswith(".csv"):
-        return "event_archive"
-    if path.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tiff")):
-        return "screenshots"
     return "other"
 
 
@@ -109,7 +105,7 @@ class _RhelAdapter(BundleAdapter):
         return "unknown"
 
     def error_sweep_categories(self) -> frozenset[str]:
-        return frozenset({"system_logs", "audit", "kernel", "kvm_logs", "event_archive"})
+        return frozenset({"system_logs", "audit", "kernel", "kvm_logs"})
 
 
 def get_adapter() -> BundleAdapter:
