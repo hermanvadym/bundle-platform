@@ -111,15 +111,6 @@ class SessionStats:
             + self.cache_read_tokens / 1_000_000 * p.cache_read_per_mtok
         )
 
-    def _compute_cost(self, model_id: str) -> float:
-        """
-        Calculate total session cost accounting for all token types and their rates.
-
-        Regular input, cache write, cache read, and output tokens are each billed
-        at different rates.
-        """
-        return self.total_cost(model_id)
-
     def compact_line(self, model_id: str) -> str:
         """
         Return a short one-line summary shown after each agent answer.

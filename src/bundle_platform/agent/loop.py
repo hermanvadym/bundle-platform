@@ -272,18 +272,15 @@ def dispatch_tool(
             )
         case "read_sos_command":
             command_name = inputs["command_name"]
-            # RHEL stores command output under sos_commands/, ESXi under commands/.
-            # Try both so the tool works transparently for either bundle type.
+            # Prefix resolution (sos_commands/ vs commands/) is handled inside
+            # read_sos_command — it tries both so this arm stays bundle-type-agnostic.
             for prefix in ("sos_commands", "commands"):
                 if (bundle_root / prefix / command_name).exists():
                     path = f"{prefix}/{command_name}"
                     stats.files_touched.add(path)
                     stats.turn_files.add(path)
-                    return tools_config.read_config(bundle_root, path)
-            return (
-                f"Command output not found: '{command_name}' "
-                "(checked sos_commands/ and commands/)"
-            )
+                    break
+            return tools_config.read_sos_command(bundle_root, command_name)
         case "find_mentions":
             paths = inputs["file_paths"]
             stats.files_touched.update(paths)
@@ -469,6 +466,20 @@ def _run_turn(
             return answer_text
 
 
+def _cost_limit_exceeded(stats: SessionStats, max_cost_usd: float | None) -> bool:
+    """Return True and print a notice when session cost has reached max_cost_usd."""
+    if max_cost_usd is None:
+        return False
+    cost = stats.total_cost(_MODEL)
+    if cost >= max_cost_usd:
+        print(
+            f"\n[cost limit ${max_cost_usd:.2f} reached — session ended]",
+            file=sys.stderr,
+        )
+        return True
+    return False
+
+
 def run_session(
     manifest: FileManifest,
     bundle_root: Path,
@@ -561,13 +572,7 @@ def run_session(
             reference_date=reference_date,
         )
 
-        if max_cost_usd is not None and stats._compute_cost(_MODEL) >= max_cost_usd:
-            cost = stats._compute_cost(_MODEL)
-            print(
-                f"\n⚠ Session cost ${cost:.2f} reached limit "
-                f"${max_cost_usd:.2f}. Use --max-cost to raise.",
-                file=sys.stderr,
-            )
+        if _cost_limit_exceeded(stats, max_cost_usd):
             break
 
         # Drop oldest Q+A pairs when history exceeds the sliding window.
@@ -665,13 +670,7 @@ def run_rag_session(
             reference_date=reference_date,
         )
 
-        if max_cost_usd is not None and stats._compute_cost(_MODEL) >= max_cost_usd:
-            cost = stats._compute_cost(_MODEL)
-            print(
-                f"\n⚠ Session cost ${cost:.2f} reached limit "
-                f"${max_cost_usd:.2f}. Use --max-cost to raise.",
-                file=sys.stderr,
-            )
+        if _cost_limit_exceeded(stats, max_cost_usd):
             break
 
         if len(messages) > _MAX_HISTORY_TURNS * 2:

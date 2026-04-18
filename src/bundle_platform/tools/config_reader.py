@@ -67,22 +67,27 @@ def read_config(bundle_root: Path, file_path: str) -> str:
     return cap_lines(numbered, limit=_MAX_CONFIG_LINES)
 
 
-def read_sos_command(bundle_root: Path, command_name: str, bundle_type: str) -> str:
+def read_sos_command(bundle_root: Path, command_name: str) -> str:
     """
     Read output from a captured command in the bundle.
 
     Why: Bundle types store command output in different directories — RHEL uses
     `sos_commands/` (produced by `sos report`) while ESXi uses `commands/`
-    (produced by `vm-support`). This function hides that difference so callers
-    always pass a bare command name.
+    (produced by `vm-support`). Trying both prefixes makes this tool work
+    transparently for either bundle type without the caller needing to know which
+    layout is in use.
 
     Args:
         bundle_root:  Root directory of the unpacked bundle.
         command_name: Bare filename of the command output (e.g. "uname").
-        bundle_type:  "rhel" or "esxi" (case-insensitive).
 
     Returns:
         Numbered file contents capped at _MAX_CONFIG_LINES, or an error string.
     """
-    subdir = "sos_commands" if bundle_type.lower() == "rhel" else "commands"
-    return read_config(bundle_root, f"{subdir}/{command_name}")
+    for prefix in ("sos_commands", "commands"):
+        if (bundle_root / prefix / command_name).exists():
+            return read_config(bundle_root, f"{prefix}/{command_name}")
+    return (
+        f"Command output not found: '{command_name}' "
+        "(checked sos_commands/ and commands/)"
+    )
