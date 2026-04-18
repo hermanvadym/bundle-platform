@@ -4,5 +4,5 @@ question: "Which VMs crashed or were reset unexpectedly, and when did it happen?
 expected_files:
   - var/log/vmkernel.log
   - var/log/hostd.log
-expected_evidence_regex: "vm.*reset|reset.*vm|vmx.*died|worldlet.*failed|vm.*unresponsive"
+expected_evidence_regex: "vmx.*died|worldlet.*failed|vm.*unresponsive|\\bvm\\b.*reset|reset.*\\bvm\\b"
 expected_answer_contains: []

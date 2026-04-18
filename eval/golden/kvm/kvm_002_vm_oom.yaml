@@ -3,6 +3,6 @@ bundle: kvm-sosreport
 question: "Which VMs or QEMU processes were killed by the OOM killer in the last 24 hours?"
 expected_files:
   - var/log/messages
-  - var/log/libvirt/qemu
+  - var/log/libvirt/qemu/
 expected_evidence_regex: "oom_kill.*qemu|qemu.*oom|Out of memory.*qemu|Killed process.*qemu-kvm"
 expected_answer_contains: []

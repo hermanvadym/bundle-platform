@@ -41,4 +41,8 @@ def test_embed_model_produces_expected_dimension() -> None:
     embedder = Embedder(model_name=EMBED_MODEL)
     vector = embedder.embed_query("test query")
     assert len(vector) > 0, "Embedder returned empty vector"
-    print(f"Embedding dimension: {len(vector)}")
+    if "bge-small" in EMBED_MODEL:
+        assert len(vector) == 384, (
+            f"Expected 384-dim vector for {EMBED_MODEL!r}, got {len(vector)}. "
+            "Model mismatch will cause Qdrant insert failures at query time."
+        )
