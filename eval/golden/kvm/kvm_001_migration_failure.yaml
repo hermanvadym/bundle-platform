@@ -1,0 +1,7 @@
+id: kvm_001_migration_failure
+bundle: kvm-sosreport
+question: "Which VM live migration failed and what was the error message?"
+expected_files:
+  - var/log/libvirt/libvirtd.log
+expected_evidence_regex: "migration.*error|error.*migration|virError|QEMU_MIGRATION|migrate.*fail"
+expected_answer_contains: []

@@ -1,0 +1,8 @@
+id: kvm_003_storage_io_error
+bundle: kvm-sosreport
+question: "Were there any storage I/O errors on VM disk images? Which VM was affected?"
+expected_files:
+  - var/log/libvirt/qemu
+  - var/log/messages
+expected_evidence_regex: "I/O error|blk_.*error|virtio.*error|qcow2.*error|disk.*error.*qemu"
+expected_answer_contains: []

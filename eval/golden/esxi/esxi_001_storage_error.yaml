@@ -1,0 +1,7 @@
+id: esxi_001_storage_error
+bundle: esxi-vm-support
+question: "What storage errors appeared in vmkernel.log in the 2 hours before the snapshot?"
+expected_files:
+  - var/log/vmkernel.log
+expected_evidence_regex: "SCSI|NFS|iSCSI|H:0x|D:0x|storageRM|NMP|naa\\."
+expected_answer_contains: []

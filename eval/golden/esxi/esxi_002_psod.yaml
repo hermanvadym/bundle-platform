@@ -1,0 +1,7 @@
+id: esxi_002_psod
+bundle: esxi-vm-support
+question: "Was there a Purple Screen of Death (PSOD)? What was the error and backtrace?"
+expected_files:
+  - var/log/vmkernel.log
+expected_evidence_regex: "PSOD|backtrace|#PF|worldlet|BSODed|vmkBSOD"
+expected_answer_contains: []
